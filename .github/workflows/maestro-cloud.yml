@@ -49,10 +49,39 @@ jobs:
             --format JUNIT \
             --output report-cloud.xml
 
-      - name: Upload Cloud report
+      - name: Convert JUnit to Allure results
+        if: always()
+        run: |
+          python3 tools/maestro_junit_to_allure.py \
+            --junit report-cloud.xml \
+            --out allure-results \
+            --env "branch=${{ github.ref_name }}" \
+            --env "commit=${{ github.sha }}" \
+            --env "target=Maestro Cloud" \
+            --executor-name "GitHub Actions" \
+            --executor-type github \
+            --build-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --build-name "maestro-cloud #${{ github.run_number }}"
+
+      - name: Setup Node for Allure CLI
+        if: always()
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate Allure report
+        if: always()
+        run: |
+          npm install -g allure-commandline
+          allure generate allure-results --clean -o allure-report
+
+      - name: Upload Cloud reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: maestro-cloud-report
-          path: report-cloud.xml
+          name: maestro-cloud-allure-report
+          path: |
+            report-cloud.xml
+            allure-results/
+            allure-report/
           if-no-files-found: warn

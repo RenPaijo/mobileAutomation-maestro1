@@ -2,7 +2,10 @@
 .maestro/
 maestro-report/
 report.xml
+report-cloud.xml
 report.html
+allure-results/
+allure-report/
 *.mp4
 
 # screenshots / recordings lokal
