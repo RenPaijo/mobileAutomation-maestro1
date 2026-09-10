@@ -1,0 +1,46 @@
+appId: com.saucelabs.mydemoapp.android
+name: 03 - Checkout E2E
+env:
+  LOGIN_USER: bob@example.com
+  LOGIN_PASS: 10203040
+---
+- runFlow: helpers/launch_app.yaml
+
+- extendedWaitUntil:
+    visible: "Sauce Labs Backpack"
+    timeout: 15000
+
+- tapOn: "Sauce Labs Backpack"
+
+- extendedWaitUntil:
+    visible: ".*Add.*[Cc]art.*"
+    timeout: 10000
+
+- tapOn: ".*Add.*[Cc]art.*"
+
+- tapOn:
+    id: "com.saucelabs.mydemoapp.android:id/cartIV"
+
+- extendedWaitUntil:
+    visible: ".*Proceed.*Checkout.*"
+    timeout: 10000
+
+- tapOn: ".*Proceed.*Checkout.*"
+
+# Login (MyDemoApp default: bob@example.com / 10203040)
+- extendedWaitUntil:
+    visible: ".*Login.*"
+    timeout: 10000
+
+- tapOn: ".*Username.*|.*Email.*"
+- inputText: ${LOGIN_USER}
+- tapOn: ".*Password.*"
+- inputText: ${LOGIN_PASS}
+- tapOn: ".*Login.*"
+
+# Checkout - Address
+- extendedWaitUntil:
+    visible: ".*Checkout.*|.*Address.*|.*Shipping.*"
+    timeout: 15000
+
+- takeScreenshot: 03_checkout_started

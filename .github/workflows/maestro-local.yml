@@ -1,0 +1,61 @@
+name: Maestro Local (Android Emulator)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  maestro-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.maestro/bin:$PATH"
+          maestro --version
+
+      - name: Check Maestro syntax
+        run: |
+          export PATH="$HOME/.maestro/bin:$PATH"
+          maestro check-syntax Maestro/flows/01_smoke_launch.yaml
+          maestro check-syntax Maestro/flows/02_add_to_cart.yaml
+          maestro check-syntax Maestro/flows/03_checkout_e2e.yaml
+
+      - name: Run Maestro on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          avd-name: maestro_pixel_6
+          ram-size: 4096M
+          heap-size: 512M
+          disk-size: 4096M
+          emulator-boot-timeout-seconds: 600
+          script: |
+            export PATH="$HOME/.maestro/bin:$PATH"
+            adb install Maestro/apps/mda-2.2.0-25.apk
+            maestro test --format JUNIT --output report.xml Maestro/flows
+
+      - name: Upload JUnit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-report
+          path: |
+            report.xml
+            ~/.maestro/tests/**/screenshots/*.png
+          if-no-files-found: warn

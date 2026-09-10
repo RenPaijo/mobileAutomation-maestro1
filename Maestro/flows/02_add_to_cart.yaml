@@ -1,0 +1,34 @@
+appId: com.saucelabs.mydemoapp.android
+name: 02 - Add To Cart
+---
+- runFlow: helpers/launch_app.yaml
+
+- extendedWaitUntil:
+    visible: "Sauce Labs Backpack"
+    timeout: 15000
+
+# Buka detail produk pertama
+- tapOn: "Sauce Labs Backpack"
+
+- extendedWaitUntil:
+    visible: ".*Add.*[Cc]art.*"
+    timeout: 10000
+
+- assertVisible: ".*Backpack.*"
+
+# Tambah ke cart
+- tapOn: ".*Add.*[Cc]art.*"
+
+# Buka cart (ikon kanan atas, content-desc Cart)
+- extendedWaitUntil:
+    visible: ".*Cart.*"
+    timeout: 10000
+
+- tapOn:
+    id: "com.saucelabs.mydemoapp.android:id/cartIV"
+
+- extendedWaitUntil:
+    visible: ".*My Cart.*|.*Your Cart.*|.*Proceed.*"
+    timeout: 10000
+
+- takeScreenshot: 02_cart_opened

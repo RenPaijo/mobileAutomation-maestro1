@@ -1,0 +1,32 @@
+# Maestro + Android + general
+.maestro/
+maestro-report/
+report.xml
+report.html
+*.mp4
+
+# screenshots / recordings lokal
+Maestro/flows/**/*.png
+screenshots/
+videos/
+
+# Android lokal
+local.properties
+*.keystore
+*.jks
+build/
+.gradle/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.iml
+node_modules/
+
+# keep APK demo untuk CI, jangan ignore:
+!Maestro/apps/*.apk
