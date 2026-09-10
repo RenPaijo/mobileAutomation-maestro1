@@ -1,5 +1,5 @@
 appId: com.saucelabs.mydemoapp.android
-name: 03 - Checkout E2E
+name: 04 - Login
 ---
 - runFlow: helpers/launch_app.yaml
 
@@ -7,6 +7,7 @@ name: 03 - Checkout E2E
     visible: "Sauce Labs Backpack"
     timeout: 15000
 
+# Reach the Login screen via cart -> checkout
 - tapOn: "Sauce Labs Backpack"
 
 - extendedWaitUntil:
@@ -24,12 +25,14 @@ name: 03 - Checkout E2E
 
 - tapOn: ".*Proceed.*Checkout.*"
 
-# Login via reusable helper (credentials via LOGIN_USER / LOGIN_PASS env)
+# Reusable login step (credentials via LOGIN_USER / LOGIN_PASS env)
 - runFlow: helpers/login.yaml
 
-# Checkout - Address
+# Successful login leaves the Login screen and continues checkout
 - extendedWaitUntil:
     visible: ".*Checkout.*|.*Address.*|.*Shipping.*"
     timeout: 15000
 
-- takeScreenshot: 03_checkout_started
+- assertVisible: ".*Checkout.*|.*Address.*|.*Shipping.*"
+
+- takeScreenshot: 04_login_success

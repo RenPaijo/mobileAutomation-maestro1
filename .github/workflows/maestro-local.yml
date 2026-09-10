@@ -32,6 +32,9 @@ jobs:
           maestro check-syntax Maestro/flows/01_smoke_launch.yaml
           maestro check-syntax Maestro/flows/02_add_to_cart.yaml
           maestro check-syntax Maestro/flows/03_checkout_e2e.yaml
+          maestro check-syntax Maestro/flows/04_login.yaml
+          maestro check-syntax Maestro/flows/helpers/launch_app.yaml
+          maestro check-syntax Maestro/flows/helpers/login.yaml
 
       - name: Run Maestro on emulator
         uses: reactivecircus/android-emulator-runner@v2

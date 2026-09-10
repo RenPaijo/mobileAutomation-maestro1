@@ -1,0 +1,26 @@
+# Reusable: submit the Login screen with credentials from env.
+#
+# Assumes the Login screen is already displayed (the caller handles
+# navigation, e.g. catalog -> cart -> checkout -> login).
+# Override globally per run, no file edit needed:
+#   maestro test -e LOGIN_USER=bob@example.com -e LOGIN_PASS=10203040 <flow>
+appId: com.saucelabs.mydemoapp.android
+name: Helper - Login
+env:
+  LOGIN_USER: bob@example.com
+  LOGIN_PASS: 10203040
+---
+- extendedWaitUntil:
+    visible: ".*Login.*"
+    timeout: 10000
+
+- tapOn: ".*Username.*|.*Email.*"
+- inputText: ${LOGIN_USER}
+
+- tapOn: ".*Password.*"
+- inputText: ${LOGIN_PASS}
+
+# Dismiss keyboard so the Login button is tappable
+- hideKeyboard
+
+- tapOn: ".*Login.*"
