@@ -52,7 +52,17 @@ jobs:
           script: |
             export PATH="$HOME/.maestro/bin:$PATH"
             adb install Maestro/apps/mda-2.2.0-25.apk
-            maestro test --format JUNIT --output report.xml Maestro/flows
+            ATTEMPT=1
+            until maestro test --format JUNIT --output report.xml Maestro/flows; do
+              if [ "$ATTEMPT" -ge 3 ]; then
+                echo "Maestro still failing after 3 attempts"
+                exit 1
+              fi
+              ATTEMPT=$((ATTEMPT+1))
+              echo "Maestro attempt failed (often flaky driver startup on CI), retrying ($ATTEMPT/3)..."
+              adb reconnect || true
+              sleep 20
+            done
 
       - name: Convert JUnit to Allure results
         if: always()
