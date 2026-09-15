@@ -151,7 +151,7 @@ Two workflows are included:
 Required secrets for the Cloud workflow (Settings > Secrets > Actions):
 
 - `MAESTRO_CLOUD_API_KEY` (required)
-- `MAESTRO_CLOUD_PROJECT_ID` (optional — remove the `--projectId` flag if unused)
+- `MAESTRO_CLOUD_PROJECT_ID` (optional — when unset, `--projectId` is omitted automatically)
 
 ## Troubleshooting
 

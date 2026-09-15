@@ -37,11 +37,16 @@ jobs:
             echo "::error::Secret MAESTRO_CLOUD_API_KEY belum diset (Settings > Secrets > Actions)"
             exit 1
           fi
+          # Only pass --projectId when the optional secret is set.
+          PROJECT_ID_ARG=""
+          if [ -n "${{ secrets.MAESTRO_CLOUD_PROJECT_ID }}" ]; then
+            PROJECT_ID_ARG="--projectId ${{ secrets.MAESTRO_CLOUD_PROJECT_ID }}"
+          fi
           maestro cloud \
             --apiKey "$MAESTRO_CLOUD_API_KEY" \
             --app-file Maestro/apps/mda-2.2.0-25.apk \
             --flows Maestro/flows \
-            --projectId "${{ secrets.MAESTRO_CLOUD_PROJECT_ID }}" \
+            $PROJECT_ID_ARG \
             --name "andro_1 ${{ github.sha }}" \
             --branch "${{ github.ref_name }}" \
             --commitSha "${{ github.sha }}" \
