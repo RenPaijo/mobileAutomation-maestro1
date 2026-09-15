@@ -7,8 +7,10 @@ name: 04 - Login
     visible: "Sauce Labs Backpack"
     timeout: 15000
 
-# Reach the Login screen via cart -> checkout
-- tapOn: "Sauce Labs Backpack"
+# Reach the Login screen via cart -> checkout (tap gambar produk: judul teks tidak clickable)
+- tapOn:
+    id: "com.saucelabs.mydemoapp.android:id/productIV"
+    index: 0
 
 - extendedWaitUntil:
     visible: ".*Add.*[Cc]art.*"
