@@ -1,0 +1,2 @@
+# Shell helpers executed on Linux CI runners must keep LF endings.
+*.sh text eol=lf
