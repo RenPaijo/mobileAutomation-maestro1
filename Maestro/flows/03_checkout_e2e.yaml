@@ -7,7 +7,9 @@ name: 03 - Checkout E2E
     visible: "Sauce Labs Backpack"
     timeout: 15000
 
-- tapOn: "Sauce Labs Backpack"
+- tapOn:
+    id: "com.saucelabs.mydemoapp.android:id/productIV"
+    index: 0
 
 - extendedWaitUntil:
     visible: ".*Add.*[Cc]art.*"

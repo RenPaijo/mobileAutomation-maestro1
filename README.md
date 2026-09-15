@@ -62,6 +62,7 @@ Validate flow syntax:
 maestro check-syntax Maestro/flows/01_smoke_launch.yaml
 maestro check-syntax Maestro/flows/02_add_to_cart.yaml
 maestro check-syntax Maestro/flows/03_checkout_e2e.yaml
+maestro check-syntax Maestro/flows/04_login.yaml
 ```
 
 Run a single flow or the whole suite:
@@ -125,7 +126,7 @@ maestro hierarchy
 | `helpers/launch_app.yaml` | Reusable launch with `clearState: true` / `stopApp: true` |
 | `helpers/login.yaml` | Reusable login submit; expects the Login screen visible, credentials via `LOGIN_USER` / `LOGIN_PASS` env (defaults `bob@example.com` / `10203040`) |
 | `01_smoke_launch.yaml` | Launch, wait for `Sauce Labs Backpack`, assert `Products` catalog, screenshot |
-| `02_add_to_cart.yaml` | Open product detail, tap `Add To Cart`, open cart via `id: .../cartIV`, assert cart, screenshot |
+| `02_add_to_cart.yaml` | Tap first product image (`productIV`) to open detail, tap `Add To Cart`, open cart via `id: .../cartIV`, assert cart, screenshot |
 | `03_checkout_e2e.yaml` | Add to cart → `Proceed To Checkout` → `helpers/login.yaml` → checkout/address step |
 | `04_login.yaml` | Login case: reach Login via cart → checkout → `helpers/login.yaml` → assert checkout/address screen, screenshot |
 
@@ -135,7 +136,9 @@ Override login without editing any flow (applies to the case and the helper):
 maestro test -e LOGIN_USER=bob@example.com -e LOGIN_PASS=10203040 Maestro/flows/04_login.yaml
 ```
 
-> Note: the cart icon selector (`com.saucelabs.mydemoapp.android:id/cartIV`) was written without a live hierarchy. If it fails, run `maestro studio` / `maestro hierarchy` and replace it with the visible `contentDescription` or text match (e.g. `tapOn: ".*Cart.*"`).
+> Notes (verified against live `uiautomator` hierarchy on emulator, API 34):
+> - Cart icon `com.saucelabs.mydemoapp.android:id/cartIV` is present and working.
+> - Product titles (`titleTV`, e.g. `Sauce Labs Backpack`) are NOT clickable — tap the product image instead (`id: .../productIV`, `index: 0` for the first product) to open the detail screen. Tapping the title text does nothing and the flow will time out waiting for `Add to cart`.
 
 ## CI (GitHub Actions)
 

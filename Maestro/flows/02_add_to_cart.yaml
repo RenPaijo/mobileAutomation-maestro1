@@ -7,8 +7,10 @@ name: 02 - Add To Cart
     visible: "Sauce Labs Backpack"
     timeout: 15000
 
-# Buka detail produk pertama
-- tapOn: "Sauce Labs Backpack"
+# Buka detail produk pertama (tap gambar produk: judul teks tidak clickable)
+- tapOn:
+    id: "com.saucelabs.mydemoapp.android:id/productIV"
+    index: 0
 
 - extendedWaitUntil:
     visible: ".*Add.*[Cc]art.*"
