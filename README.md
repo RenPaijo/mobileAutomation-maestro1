@@ -23,7 +23,8 @@ Maestro-based mobile automation for Android, tested against the Sauce Labs MyDem
 │           ├── launch_app.yaml
 │           └── login.yaml
 ├── tools/
-│   └── maestro_junit_to_allure.py   # JUnit XML -> Allure results (stdlib only)
+│   ├── maestro_junit_to_allure.py   # JUnit XML -> Allure results (stdlib only)
+│   └── maestro_test_retry.sh        # install APK + run each top-level flow with bounded retries
 ├── .github/
 │   └── workflows/
 │       ├── maestro-local.yml   # emulator runner, no API key needed
@@ -65,18 +66,22 @@ maestro check-syntax Maestro/flows/03_checkout_e2e.yaml
 maestro check-syntax Maestro/flows/04_login.yaml
 ```
 
-Run a single flow or the whole suite:
+Run a single top-level flow:
 
 ```bash
 maestro test Maestro/flows/01_smoke_launch.yaml
-maestro test Maestro/flows
 ```
 
 JUnit report:
 
 ```bash
-maestro test --format JUNIT --output report.xml Maestro/flows
+maestro test --format JUNIT --output report-01_smoke_launch.xml \
+  Maestro/flows/01_smoke_launch.yaml
 ```
+
+The reusable files under `Maestro/flows/helpers/` are not standalone tests.
+CI executes the four top-level flows explicitly so a failing flow can be
+identified independently.
 
 ## Reporting with Allure
 
@@ -95,10 +100,11 @@ npm install -g allure-commandline
 Generate and view a report locally:
 
 ```bash
-maestro test --format JUNIT --output report.xml Maestro/flows
+maestro test --format JUNIT --output report-01_smoke_launch.xml \
+  Maestro/flows/01_smoke_launch.yaml
 
 python tools/maestro_junit_to_allure.py \
-  --junit report.xml \
+  --junit report-01_smoke_launch.xml \
   --out allure-results \
   --screenshots ~/.maestro/tests \
   --env "device=pixel_6 (API 33)" \
@@ -108,9 +114,12 @@ allure serve allure-results
 # or: allure generate allure-results --clean -o allure-report
 ```
 
-In CI, both workflows already do this automatically and upload
-`report.xml`, `allure-results/`, and `allure-report/` as artifacts
-(`maestro-allure-report`, `maestro-cloud-allure-report`).
+In CI, the local workflow runs each top-level flow with up to three bounded
+attempts and writes one JUnit file per flow (`report-*.xml`). It converts the
+available JUnit files to Allure results and uploads reports plus emulator
+diagnostics (`adb-log-*.txt`) as `maestro-allure-report` and
+`maestro-emulator-diagnostics` artifacts. The cloud workflow uses
+`report-cloud.xml` and `maestro-cloud-allure-report`.
 
 Debug selectors:
 
@@ -144,13 +153,13 @@ maestro test -e LOGIN_USER=bob@example.com -e LOGIN_PASS=10203040 Maestro/flows/
 
 Two workflows are included:
 
-- `maestro-local.yml` — runs on `push` to `main`, PRs, and manual dispatch. Provisions a `pixel_6` emulator (API 33), installs the APK, runs `check-syntax`, then `maestro test Maestro/flows`, converts the JUnit output to Allure results, and generates the HTML report. Uploads `report.xml`, `allure-results/`, and `allure-report/` as the `maestro-allure-report` artifact. No secrets required.
+- `maestro-local.yml` — runs on `push` to `main`, PRs, and manual dispatch. Provisions a `pixel_6` emulator (API 33), installs the APK, runs `check-syntax`, then executes the four top-level flows independently. Each flow has up to three bounded attempts; failed attempts save ADB logcat diagnostics. JUnit files are converted to Allure results and uploaded with the HTML report. No secrets required.
 - `maestro-cloud.yml` — runs on `push` to `main`, manual dispatch, and nightly (`0 1 * * *`). Uploads the APK + `Maestro/flows` to Maestro Cloud with JUnit output (`report-cloud.xml`), then converts and generates the Allure report (`maestro-cloud-allure-report` artifact).
 
 Required secrets for the Cloud workflow (Settings > Secrets > Actions):
 
 - `MAESTRO_CLOUD_API_KEY` (required)
-- `MAESTRO_CLOUD_PROJECT_ID` (optional — remove the `--projectId` flag if unused)
+- `MAESTRO_CLOUD_PROJECT_ID` (optional — when unset, `--projectId` is omitted automatically)
 
 ## Troubleshooting
 
