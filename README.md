@@ -23,7 +23,8 @@ Maestro-based mobile automation for Android, tested against the Sauce Labs MyDem
 │           ├── launch_app.yaml
 │           └── login.yaml
 ├── tools/
-│   └── maestro_junit_to_allure.py   # JUnit XML -> Allure results (stdlib only)
+│   ├── maestro_junit_to_allure.py   # JUnit XML -> Allure results (stdlib only)
+│   └── maestro_test_retry.sh        # install APK + run suite with 3x retry (single-line call: the emulator runner executes each workflow script line separately)
 ├── .github/
 │   └── workflows/
 │       ├── maestro-local.yml   # emulator runner, no API key needed
@@ -150,7 +151,7 @@ Two workflows are included:
 Required secrets for the Cloud workflow (Settings > Secrets > Actions):
 
 - `MAESTRO_CLOUD_API_KEY` (required)
-- `MAESTRO_CLOUD_PROJECT_ID` (optional — remove the `--projectId` flag if unused)
+- `MAESTRO_CLOUD_PROJECT_ID` (optional — when unset, `--projectId` is omitted automatically)
 
 ## Troubleshooting
 
