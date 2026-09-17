@@ -53,19 +53,21 @@ jobs:
           script: sh tools/maestro_test_retry.sh
 
       - name: Convert JUnit to Allure results
-        if: always() && hashFiles('report.xml') != ''
+        if: always() && hashFiles('report-*.xml') != ''
         run: |
-          python3 tools/maestro_junit_to_allure.py \
-            --junit report.xml \
-            --out allure-results \
-            --screenshots ~/.maestro/tests \
-            --env "branch=${{ github.ref_name }}" \
-            --env "commit=${{ github.sha }}" \
-            --env "device=pixel_6 (API 33)" \
-            --executor-name "GitHub Actions" \
-            --executor-type github \
-            --build-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            --build-name "maestro-local #${{ github.run_number }}"
+          for report in report-*.xml; do
+            python3 tools/maestro_junit_to_allure.py \
+              --junit "$report" \
+              --out allure-results \
+              --screenshots ~/.maestro/tests \
+              --env "branch=${{ github.ref_name }}" \
+              --env "commit=${{ github.sha }}" \
+              --env "device=pixel_6 (API 33)" \
+              --executor-name "GitHub Actions" \
+              --executor-type github \
+              --build-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+              --build-name "maestro-local #${{ github.run_number }}"
+          done
 
       - name: Setup Node for Allure CLI
         if: always()
@@ -85,7 +87,7 @@ jobs:
         with:
           name: maestro-allure-report
           path: |
-            report.xml
+            report-*.xml
             allure-results/
             allure-report/
           if-no-files-found: warn
@@ -96,6 +98,6 @@ jobs:
         with:
           name: maestro-emulator-diagnostics
           path: |
-            adb-log-attempt-*.txt
+            adb-log-*.txt
             ~/.maestro/tests/
           if-no-files-found: warn
